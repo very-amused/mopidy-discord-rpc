@@ -7,7 +7,7 @@ import (
 )
 
 const clientID = "796397801797320715"
-const imageKey = "logo"
+const largeImageKey = "logo"
 
 func main() {
 	// Allow the user to specify a custom URL
@@ -16,7 +16,7 @@ func main() {
 
 	// Initialize discord RPC
 	discord.InitRPC(clientID)
-	discord.Presence.LargeImageKey = imageKey
+	discord.Presence.LargeImageKey = largeImageKey
 	defer discord.ShutdownRPC()
 
 	// Connect to mopidy websocket, 2s timeout

@@ -15,6 +15,7 @@ var Presence = struct {
 	Details       string
 	State         string
 	LargeImageKey string
+	SmallImageKey string
 }{}
 
 // InitRPC - Initialize connection to Discord and begin updating RPC
@@ -33,6 +34,7 @@ func UpdateRPC() {
 	presence.details = C.CString(Presence.Details)
 	presence.state = C.CString(Presence.State)
 	presence.largeImageKey = C.CString(Presence.LargeImageKey)
+	presence.smallImageKey = C.CString(Presence.SmallImageKey)
 
 	C.Discord_UpdatePresence(&presence)
 }
