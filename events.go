@@ -40,16 +40,17 @@ type MopidyArtist struct {
 	Name string `json:"name"`
 }
 
-// Mopidy events enum
+// mopidyEvent - Event message fired from mopidy
+type mopidyEvent string
+
+// Declaration of all Mopidy event messages listened to
 const (
-	// New playback state, compare NewState with OldState before updating
-	playbackStateChanged = "playback_state_changed"
 	// Track started playing, details in Track
-	trackPlaybackStarted = "track_playback_started"
+	trackPlaybackStarted mopidyEvent = "track_playback_started"
 	// Track stopped playing
-	trackPlaybackPaused = "track_playback_paused"
+	trackPlaybackPaused mopidyEvent = "track_playback_paused"
 	// Track was resumed
-	trackPlaybackResumed = "track_playback_resumed"
+	trackPlaybackResumed mopidyEvent = "track_playback_resumed"
 )
 
 var (
@@ -65,7 +66,7 @@ func onMessage(message MopidyRPCMessage) {
 		return
 	}
 
-	switch *message.Event {
+	switch mopidyEvent(*message.Event) {
 	case trackPlaybackStarted:
 		playback.Elapsed = 0
 		playback.Total = (*message.TLTrack).Track.Length * time.Millisecond
