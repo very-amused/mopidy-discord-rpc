@@ -18,7 +18,34 @@ type Playback struct {
 	Elapsed   time.Duration
 	Total     time.Duration
 	Ticker    *time.Ticker
-	Done      chan (bool)
+
+	// Each time a goroutine may want to be canceled early, it is added to []Cancel
+	// Iterating over the range here, and sending a message to each channel will shutdown each goroutine and give the current one authoritve control of state
+	Cancel *chan (bool)
+	Done   chan (bool)
+}
+
+func (p *Playback) init() {
+	// Create the playback's Done channel
+	p.Done = make(chan bool)
+	// Initialize and stop the playback ticker
+	p.Ticker = time.NewTicker(time.Second)
+	p.Ticker.Stop()
+	go func() {
+		for {
+			select {
+			// Do not destroy and recreate the ticker, only stop and start it on relevant play/pause events
+			case <-p.Ticker.C:
+				p.write()
+				p.Elapsed += time.Second
+
+			// p.Done closes the playback goroutine
+			case <-p.Done:
+				p.Ticker.Stop()
+				return
+			}
+		}
+	}()
 }
 
 func (p *Playback) write() {
@@ -43,37 +70,17 @@ func (p *Playback) write() {
 	discord.UpdateRPC()
 }
 
-var playback = Playback{
-	Done: make(chan bool)}
-
 func (p *Playback) pause() {
-	// If already playing, close the existing ticker goroutine (IsPlaying guarantees that a goroutine is listening on the done channe)
-	if p.IsPlaying {
-		p.Done <- true
-	}
+	p.Ticker.Stop()
 	p.IsPlaying = false
 	p.write()
 }
 
 func (p *Playback) play() {
-	p.Ticker = time.NewTicker(time.Second)
+	// Cancel any pending syncs
 	p.IsPlaying = true
-
 	p.write()
-
-	go func() {
-		for {
-			select {
-			case <-p.Ticker.C:
-				p.write()
-				p.Elapsed += time.Second
-
-			case <-p.Done:
-				p.Ticker.Stop()
-				return
-			}
-		}
-	}()
+	p.Ticker.Reset(time.Second)
 }
 
 // setDetails - Set playback details (artists and title)
@@ -101,26 +108,34 @@ func (p *Playback) syncAndPlay(elapsed time.Duration) {
 	offset := time.Duration(math.Floor(
 		math.Mod(float64(elapsed.Milliseconds()), 1000))) * time.Millisecond
 
-	// Create and start a timer that will go off at the nearest second
-	start := time.Now()
-	var timer *time.Timer
 	if offset.Milliseconds() == 0 {
-		timer = time.NewTimer(0)
-	} else {
-		timer = time.NewTimer(time.Second - offset)
-	}
-
-	// Listen for p.Done here, which would fire if the user paused the track before the nearest second was reached
-	// To synchronize perfectly with the Mopidy tick (millisecond precision),
-	// add the exact amount of time elapsed since the timer was initialized when a channel responds
-	select {
-	case <-p.Done:
-		p.Elapsed += time.Now().Sub(start)
-		timer.Stop()
-		return
-
-	case <-timer.C:
-		p.Elapsed += time.Now().Sub(start)
 		p.play()
+		return
 	}
+	// Create and start a timer that will go off at the next second
+	start := time.Now()
+	timer := time.NewTimer(time.Second - offset)
+
+	// Block until the timer is done, return if the track was paused in this time
+	cancel := make(chan bool)
+	p.Cancel = &cancel
+	go func() {
+		for {
+			select {
+			case <-timer.C:
+				p.Elapsed += time.Now().Sub(start)
+				p.play()
+
+			case <-cancel:
+				timer.Stop()
+				return
+			}
+		}
+	}()
+}
+
+var playback = Playback{}
+
+func init() {
+	playback.init()
 }

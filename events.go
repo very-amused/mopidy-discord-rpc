@@ -66,6 +66,12 @@ func onMessage(message MopidyRPCMessage) {
 		return
 	}
 
+	// If an event has started a goroutine, tell it to exit early
+	if playback.Cancel != nil {
+		*playback.Cancel <- true
+		playback.Cancel = nil
+	}
+
 	switch mopidyEvent(*message.Event) {
 	case trackPlaybackStarted:
 		playback.Elapsed = 0

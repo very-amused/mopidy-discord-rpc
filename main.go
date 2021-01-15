@@ -26,9 +26,13 @@ func main() {
 	}
 
 	defer conn.Close()
+	defer func() {
+		playback.Done <- true
+	}()
+
 	for {
 		var message MopidyRPCMessage
 		conn.ReadJSON(&message)
-		go onMessage(message)
+		onMessage(message)
 	}
 }
