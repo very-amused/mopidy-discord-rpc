@@ -26,9 +26,6 @@ func main() {
 	}
 
 	defer conn.Close()
-	defer func() {
-		playback.Done <- true
-	}()
 
 	for {
 		var message MopidyRPCMessage

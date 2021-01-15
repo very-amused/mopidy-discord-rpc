@@ -19,31 +19,21 @@ type Playback struct {
 	Total     time.Duration
 	Ticker    *time.Ticker
 
-	// Each time a goroutine may want to be canceled early, it is added to []Cancel
-	// Iterating over the range here, and sending a message to each channel will shutdown each goroutine and give the current one authoritve control of state
+	// If an event starts a goroutine that outlives its scope, this goroutine MUST set Cancel, which it listens to throughout its entire lifetime
+	// This goroutine must only exit when a message is received on Cancel, exiting before this will cause a deadlock in the event loop
 	Cancel *chan (bool)
-	Done   chan (bool)
 }
 
 func (p *Playback) init() {
-	// Create the playback's Done channel
-	p.Done = make(chan bool)
 	// Initialize and stop the playback ticker
 	p.Ticker = time.NewTicker(time.Second)
 	p.Ticker.Stop()
 	go func() {
 		for {
-			select {
 			// Do not destroy and recreate the ticker, only stop and start it on relevant play/pause events
-			case <-p.Ticker.C:
-				p.write()
-				p.Elapsed += time.Second
-
-			// p.Done closes the playback goroutine
-			case <-p.Done:
-				p.Ticker.Stop()
-				return
-			}
+			<-p.Ticker.C
+			p.write()
+			p.Elapsed += time.Second
 		}
 	}()
 }

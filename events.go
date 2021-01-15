@@ -68,7 +68,23 @@ func onMessage(message MopidyRPCMessage) {
 
 	// If an event has started a goroutine, tell it to exit early
 	if playback.Cancel != nil {
+		success := make(chan bool)
+		// Detect if waiting for a goroutine to close lasts for over 5 seconds, signaling a deadlock
+		go func() {
+			dlTimer := time.NewTimer(5 * time.Second)
+			for {
+				select {
+				case <-dlTimer.C:
+					panic("playback.Cancel has blocked for 5 seconds, deadlock detected!")
+
+				case <-success:
+					dlTimer.Stop()
+					return
+				}
+			}
+		}()
 		*playback.Cancel <- true
+		success <- true
 		playback.Cancel = nil
 	}
 
