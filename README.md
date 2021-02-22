@@ -13,3 +13,8 @@ Discord RPC for Mopidy.
 - [ ] Get current state from RPC on startup
 - [ ] Subicons for Spotify/local playback (Spotify is done)
 - [ ] Handle fast-forward/rewind events
+
+## Attributions
+| Work Used | Attribution |
+---------------------------
+| Folder icon for local music | ["Paper Icons" by Sam Hewitt is licensed under CC-SA-4.0](https://github.com/snwh/paper-icon-theme) |
