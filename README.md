@@ -11,10 +11,5 @@ Discord RPC for Mopidy.
 - [x] Custom icon
 - [x] Timer synchronizes with play/pause events 
 - [ ] Get current state from RPC on startup
-- [ ] Subicons for Spotify/local playback (Spotify is done)
+- [x] Spotify icon for playback from `mopidy-spotify`
 - [ ] Handle fast-forward/rewind events
-
-## Attributions
-| Work Used | Attribution |
----------------------------
-| Folder icon for local music | ["Paper Icons" by Sam Hewitt is licensed under CC-SA-4.0](https://github.com/snwh/paper-icon-theme) |

@@ -98,6 +98,7 @@ func onMessage(message MopidyRPCMessage) {
 		playback.Total = (*message.TLTrack).Track.Length * time.Millisecond
 		playback.setDetails((*message.TLTrack).Track)
 		playback.play()
+		break
 
 	case trackPlaybackResumed:
 		// Write that the track is playing without delay
@@ -107,8 +108,10 @@ func onMessage(message MopidyRPCMessage) {
 		playback.write()
 		// Sync the ticker and play
 		playback.syncAndPlay((*message.TimePosition) * time.Millisecond)
+		break
 
 	case trackPlaybackPaused:
 		playback.pause()
+		break
 	}
 }

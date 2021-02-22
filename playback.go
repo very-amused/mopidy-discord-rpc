@@ -50,12 +50,17 @@ func (p *Playback) write() {
 	totalMinutes := int(math.Floor(p.Total.Minutes()))
 	totalSeconds := int(math.Floor(math.Mod(p.Total.Seconds(), 60)))
 
-	discord.Presence.Details = fmt.Sprintf("%s - %s", p.Artists, p.Title)
+	// Only show title if no artists were found
+	if len(p.Artists) == 0 {
+		discord.Presence.Details = p.Title
+	} else {
+		discord.Presence.Details = fmt.Sprintf("%s - %s", p.Artists, p.Title)
+	}
 	discord.Presence.State = fmt.Sprintf("%s (%02d:%02d/%02d:%02d)", playbackState, elapsedMinutes, elapsedSeconds, totalMinutes, totalSeconds)
 	if p.Source == "spotify" {
 		discord.Presence.SmallImageKey = "spotify"
-	} else {
-		discord.Presence.SmallImageKey = ""
+	} else if p.Source == "local" {
+		discord.Presence.SmallImageKey = "folder-blue-border"
 	}
 	discord.UpdateRPC()
 }
