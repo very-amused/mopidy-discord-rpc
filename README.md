@@ -16,5 +16,5 @@ Discord RPC for Mopidy.
 
 ## Attributions
 | Work Used | Attribution |
----------------------------
+|-----------|-------------|
 | Folder icon for local music | ["Paper Icons" by Sam Hewitt is licensed under CC-SA-4.0](https://github.com/snwh/paper-icon-theme) |
