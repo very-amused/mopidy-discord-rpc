@@ -2,7 +2,8 @@
 Discord RPC for Mopidy.
 
 ## Screenshots
-[TBA]
+![Playing screenshot (Spotify)](screenshots/mopidyrpc-playing-spotify.png)
+![Paused screenshot (Spotify)](screenshots/mopidyrpc-paused-spotify.png)
 
 ## Roadmap/Features
 - [x] Handle Track & Artist Names
