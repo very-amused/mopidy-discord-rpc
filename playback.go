@@ -57,10 +57,11 @@ func (p *Playback) write() {
 		discord.Presence.Details = fmt.Sprintf("%s - %s", p.Artists, p.Title)
 	}
 	discord.Presence.State = fmt.Sprintf("%s (%02d:%02d/%02d:%02d)", playbackState, elapsedMinutes, elapsedSeconds, totalMinutes, totalSeconds)
+	// Show a small spotify subicon for music played from spotify, otherwise show no subicon
 	if p.Source == "spotify" {
 		discord.Presence.SmallImageKey = "spotify"
-	} else if p.Source == "local" {
-		discord.Presence.SmallImageKey = "folder-blue-border"
+	} else {
+		discord.Presence.SmallImageKey = ""
 	}
 	discord.UpdateRPC()
 }
