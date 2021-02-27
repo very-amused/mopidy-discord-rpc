@@ -97,6 +97,12 @@ func (p *Playback) setDetails(track MopidyTrack) {
 	p.Title = track.Name
 }
 
+func (p *Playback) clear() {
+	p.Ticker.Stop()
+	p = &Playback{Ticker: p.Ticker}
+	p.write()
+}
+
 // Sync the playback ticker to Mopidy's ticker, resuming playback when in sync
 func (p *Playback) syncAndPlay(elapsed time.Duration) {
 	// Get offset from the previous second
@@ -104,14 +110,11 @@ func (p *Playback) syncAndPlay(elapsed time.Duration) {
 	offset := time.Duration(math.Floor(
 		math.Mod(float64(elapsed.Milliseconds()), 1000))) * time.Millisecond
 
-	// Don't sync if less than 50ms off, as that would be more likely to cause desync issues than to fix them
-	if offset.Milliseconds() <= 50 {
-		p.Elapsed += time.Second
+	if offset == 0 {
 		p.play()
 		return
 	}
 	// Create and start a timer that will go off at the next second
-	start := time.Now()
 	timer := time.NewTimer(time.Second - offset)
 
 	// Block until the timer is done, return if the track was paused in this time
@@ -121,7 +124,7 @@ func (p *Playback) syncAndPlay(elapsed time.Duration) {
 		for {
 			select {
 			case <-timer.C:
-				p.Elapsed += time.Now().Sub(start)
+				p.Elapsed += (time.Second - offset)
 				p.play()
 
 			case <-cancel:

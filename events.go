@@ -40,6 +40,8 @@ type MopidyArtist struct {
 	Name string `json:"name"`
 }
 
+// #region Mopidy JSON-RPC 2.0 communication
+
 // MopidyRPCRequest - Request for RPC information from mopidy
 type MopidyRPCRequest struct {
 	JSONRPC string `json:"jsonrpc"`
@@ -48,10 +50,11 @@ type MopidyRPCRequest struct {
 }
 
 type MopidyRPCResponse struct {
-	JSONRPC string      `json:"jsonrpc"`
-	ID      string      `json:"id"`
-	Result  interface{} `json:"result"`
+	JSONRPC string `json:"jsonrpc"`
+	ID      string `json:"id"`
 }
+
+// #endregion
 
 // mopidyEvent - Event message fired from mopidy
 type mopidyEvent string

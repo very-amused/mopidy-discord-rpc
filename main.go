@@ -3,11 +3,14 @@ package main
 import (
 	"flag"
 
+	"github.com/gorilla/websocket"
 	discord "github.com/very-amused/mopidy-discord-rpc/discord"
 )
 
 const clientID = "796397801797320715"
 const largeImageKey = "logo"
+
+var conn *websocket.Conn
 
 func main() {
 	// Allow the user to specify a custom URL
@@ -20,12 +23,16 @@ func main() {
 	defer discord.ShutdownRPC()
 
 	// Connect to mopidy websocket, 2s timeout
-	conn, _, err := dialer.Dial(url, nil)
+	var err error
+	conn, _, err = dialer.Dial(url, nil)
 	if err != nil {
 		panic(err)
 	}
 
 	defer conn.Close()
+
+	// Populate initial RPC
+	initRPC()
 
 	for {
 		var message MopidyRPCMessage
