@@ -64,6 +64,8 @@ const (
 	trackPlaybackPaused mopidyEvent = "track_playback_paused"
 	// Track was resumed
 	trackPlaybackResumed mopidyEvent = "track_playback_resumed"
+
+	seeked mopidyEvent = "seeked"
 )
 
 var (
@@ -112,6 +114,10 @@ func onMessage(message MopidyRPCMessage) {
 
 	case trackPlaybackPaused:
 		playback.pause()
+		break
+
+	case seeked:
+		playback.syncAndPlay(*(message.TimePosition) * time.Millisecond)
 		break
 	}
 }
