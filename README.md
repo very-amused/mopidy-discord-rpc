@@ -12,4 +12,4 @@ Discord RPC for Mopidy.
 - [x] Timer synchronizes with play/pause events 
 - [ ] Get current state from RPC on startup
 - [x] Spotify icon for playback from `mopidy-spotify`
-- [ ] Handle fast-forward/rewind events
+- [x] Handle fast-forward/rewind events

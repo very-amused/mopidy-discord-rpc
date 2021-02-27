@@ -104,7 +104,9 @@ func (p *Playback) syncAndPlay(elapsed time.Duration) {
 	offset := time.Duration(math.Floor(
 		math.Mod(float64(elapsed.Milliseconds()), 1000))) * time.Millisecond
 
-	if offset.Milliseconds() == 0 {
+	// Don't sync if less than 50ms off, as that would be more likely to cause desync issues than to fix them
+	if offset.Milliseconds() <= 50 {
+		p.Elapsed += time.Second
 		p.play()
 		return
 	}
