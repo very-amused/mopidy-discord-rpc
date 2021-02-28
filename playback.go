@@ -99,8 +99,10 @@ func (p *Playback) setDetails(track MopidyTrack) {
 
 func (p *Playback) clear() {
 	p.Ticker.Stop()
-	p = &Playback{Ticker: p.Ticker}
-	p.write()
+	discord.Presence.State = ""
+	discord.Presence.Details = ""
+	discord.Presence.SmallImageKey = ""
+	discord.UpdateRPC()
 }
 
 // Sync the playback ticker to Mopidy's ticker, resuming playback when in sync
