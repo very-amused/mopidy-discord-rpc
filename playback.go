@@ -18,7 +18,6 @@ type Playback struct {
 	Elapsed   time.Duration
 	Total     time.Duration
 	Ticker    *time.Ticker
-	Stop      chan (bool)
 
 	// If an event starts a goroutine that outlives its scope, this goroutine MUST set Cancel, which it listens to throughout its entire lifetime
 	// This goroutine must only exit when a message is received on Cancel, exiting before this will cause a deadlock in the event loop
@@ -28,19 +27,9 @@ type Playback struct {
 func (p *Playback) init() {
 	// Initialize and stop the playback ticker
 	p.Ticker = time.NewTicker(time.Second)
-	p.Stop = make(chan bool)
 	p.Ticker.Stop()
 	go func() {
 		for {
-			select {
-			case <-p.Stop:
-				p.Ticker.Stop()
-				break
-			case <-p.Ticker.C:
-				p.write()
-				p.Elapsed += time.Second
-				break
-			}
 			// Do not destroy and recreate the ticker, only stop and start it on relevant play/pause events
 			<-p.Ticker.C
 			p.write()
@@ -113,6 +102,8 @@ func (p *Playback) clear() {
 	discord.ClearRPC()
 }
 
+/* This function isn't used in any release, as it introduced far more problems than it fixed in testing.
+ * This will remain commented out here, as some of this code may be useful in working towards a more precise sync in the future.
 // Sync the playback ticker to Mopidy's ticker, resuming playback when in sync
 func (p *Playback) syncAndPlay(elapsed time.Duration) {
 	// Get offset from the previous second
@@ -144,6 +135,7 @@ func (p *Playback) syncAndPlay(elapsed time.Duration) {
 		}
 	}()
 }
+*/
 
 var playback = Playback{}
 
