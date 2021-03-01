@@ -3,7 +3,6 @@ package discord
 /*
 #cgo CFLAGS: -I/usr/include
 #cgo LDFLAGS: -L/usr/lib -ldiscord-rpc
-#include <discord_register.h>
 #include <discord_rpc.h>
 */
 import "C"
