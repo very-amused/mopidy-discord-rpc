@@ -38,3 +38,8 @@ func UpdateRPC() {
 
 	C.Discord_UpdatePresence(&presence)
 }
+
+// ClearRPC - Clear the RPC presence
+func ClearRPC() {
+	C.Discord_ClearPresence()
+}

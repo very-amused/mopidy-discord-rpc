@@ -63,12 +63,10 @@ type mopidyEvent string
 const (
 	// Track started playing, details in Track
 	trackPlaybackStarted mopidyEvent = "track_playback_started"
-	// Track stopped playing
-	trackPlaybackPaused mopidyEvent = "track_playback_paused"
 	// Track was resumed
 	trackPlaybackResumed mopidyEvent = "track_playback_resumed"
-	// Track ended (stopped)
-	trackPlaybackEnded mopidyEvent = "track_playback_ended"
+	// Playback state changed
+	playbackStateChanged mopidyEvent = "playback_state_changed"
 
 	seeked mopidyEvent = "seeked"
 )
@@ -104,29 +102,32 @@ func onMessage(message MopidyRPCMessage) {
 		playback.Elapsed = 0
 		playback.Total = (*message.TLTrack).Track.Length * time.Millisecond
 		playback.setDetails((*message.TLTrack).Track)
-		playback.play()
 		break
 
 	case trackPlaybackResumed:
 		// Write that the track is playing without delay
 		playback.IsPlaying = true
 		playback.Total = (*message.TLTrack).Track.Length * time.Millisecond
+		playback.Elapsed = *message.TimePosition * time.Millisecond
 		playback.setDetails((*message.TLTrack).Track)
-		playback.write()
-		// Sync the ticker and play
-		playback.syncAndPlay((*message.TimePosition) * time.Millisecond)
 		break
 
-	case trackPlaybackPaused:
-		playback.pause()
-		break
-
-	case trackPlaybackEnded:
-		playback.clear()
+	case playbackStateChanged:
+		switch *message.NewState {
+		case "stopped":
+			playback.clear()
+			break
+		case "playing":
+			playback.play()
+			break
+		case "paused":
+			playback.pause()
+		}
 		break
 
 	case seeked:
-		playback.syncAndPlay(*(message.TimePosition) * time.Millisecond)
+		playback.Elapsed = *message.TimePosition * time.Millisecond
+		playback.play()
 		break
 	}
 }

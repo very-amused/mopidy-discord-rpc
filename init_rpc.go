@@ -39,10 +39,10 @@ func initRPC() {
 	}
 	makeRPCRequest(id, "core.playback.get_time_position")
 	readRPCResponse(id, &timeInfo)
+	playback.Elapsed = timeInfo.Result * time.Millisecond
 	if playbackState.Result == "playing" {
-		playback.syncAndPlay(timeInfo.Result*time.Millisecond + time.Second)
+		playback.play()
 	} else {
-		playback.Elapsed = timeInfo.Result * time.Millisecond
 		playback.write()
 	}
 }
