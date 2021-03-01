@@ -27,4 +27,4 @@ Build-time dependencies: `go`, `libdiscordprc`
 - [x] Get current state from RPC on startup
 - [x] Spotify icon for playback from `mopidy-spotify`
 - [x] Handle fast-forward/rewind events
-- [x] Handle tracks ending (doesn't work sometimes, don't know why)
+- [x] Handle tracks ending
