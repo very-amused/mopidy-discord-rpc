@@ -1,6 +1,8 @@
 # mopidy-discord-rpc
 Discord RPC for Mopidy.
 
+![Platform: Linux](https://img.shields.io/badge/Platform-Linux%20x64-brightgreen?style=flat-square&logo=linux)
+
 ## Screenshots
 ![Playing screenshot (Spotify)](screenshots/mopidyrpc-playing-spotify.png)
 
